@@ -1,0 +1,11 @@
+Incident_ID,District,Zone,Crime_Type,Priority_Level,Response_Time_Mins,Police_Units_Deployed,Status,Date
+UP-1001,Lucknow,Central,Cyber Fraud,High,15,3,In Progress,2026-07-01
+UP-1002,Kanpur,Kanpur Outer,Robbery,Critical,8,5,Resolved,2026-07-01
+UP-1003,Meerut,Meerut Zone,Vehicle Theft,Medium,25,2,Pending,2026-07-02
+UP-1004,Varanasi,Kashi,Public Disturbance,Low,30,2,Resolved,2026-07-02
+UP-1005,Noida,Gautam Buddh Nagar,Cyber Fraud,Critical,10,4,In Progress,2026-07-03
+UP-1006,Agra,Agra Zone,Chain Snatching,High,12,3,Resolved,2026-07-03
+UP-1007,Prayagraj,Prayagraj Zone,Land Dispute,Medium,40,2,Pending,2026-07-04
+UP-1008,Gorakhpur,Gorakhpur Zone,Assault,High,18,4,Resolved,2026-07-04
+UP-1009,Ghaziabad,Gautam Buddh Nagar,Cyber Fraud,Critical,9,6,In Progress,2026-07-05
+UP-1010,Bareilly,Bareilly Zone,Burglary,Medium,22,2,Resolved,2026-07-05

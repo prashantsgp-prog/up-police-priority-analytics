@@ -1,18 +1,22 @@
 import os
 import pandas as pd
+import streamlit as st
 from langchain_openai import ChatOpenAI
 from langchain_experimental.agents.agent_toolkits import create_pandas_dataframe_agent
 
-# 1. Yahan apni actual API Key quotes "" ke andar paste karein
-MY_API_KEY = "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"
+# 1. Streamlit Secrets se API key read karein (Secure Way)
+if "OPENROUTER_API_KEY" in st.secrets:
+    api_key = st.secrets["OPENROUTER_API_KEY"]
+else:
+    api_key = os.environ.get("OPENROUTER_API_KEY", "")
 
-# 2. Data file load karein
+# 2. Data load karein
 df = pd.read_csv("data/up-police-priority-data.csv")
 
-# 3. Hermes LLM Model initialize karein
+# 3. Hermes LLM Setup
 llm = ChatOpenAI(
     model="nousresearch/nous-hermes-2-mixtral-8x7b-dpo",
-    openai_api_key=MY_API_KEY,
+    openai_api_key=api_key,
     openai_api_base="https://openrouter.ai/api/v1",
     temperature=0.1
 )

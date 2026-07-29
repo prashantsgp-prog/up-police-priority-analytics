@@ -4,41 +4,51 @@ import streamlit as st
 from langchain_openai import ChatOpenAI
 from langchain_experimental.agents.agent_toolkits import create_pandas_dataframe_agent
 
-# 1. Streamlit Secrets se Key Read karein
-api_key = ""
-if "OPENROUTER_API_KEY" in st.secrets:
-    api_key = st.secrets["OPENROUTER_API_KEY"]
-else:
-    api_key = os.environ.get("OPENROUTER_API_KEY", "")
-
-# 2. Data File Load karein
+# 1. CSV Data Load Karein
 df = pd.read_csv("data/up-police-priority-data.csv")
 
-# 3. Hermes LLM Setup (OpenRouter Required Headers ke saath)
-llm = ChatOpenAI(
-    model="nousresearch/nous-hermes-2-mixtral-8x7b-dpo:free",  # :free tag lagaya hai taaki zero balance par bhi chale
-    api_key=api_key,
-    base_url="https://openrouter.ai/api/v1",
-    default_headers={
-        "HTTP-Referer": "https://streamlit.io",
-        "X-Title": "UP Police Analytics"
-    },
-    temperature=0.1
-)
-
-# 4. Agent Initialization
-agent = create_pandas_dataframe_agent(
-    llm, 
-    df, 
-    verbose=True, 
-    allow_dangerous_code=True
-)
-
 def get_agent_response(query):
+    # 2. Key Fetching with Verification
+    api_key = ""
+    
+    # Check Streamlit Secrets
+    if "OPENROUTER_API_KEY" in st.secrets:
+        api_key = str(st.secrets["OPENROUTER_API_KEY"]).strip()
+    
+    # Backup Check Environment Variables
     if not api_key:
-        return "⚠️ Error: Streamlit Secrets mein API Key nahi mili. Kripya Settings > Secrets check karein."
+        api_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
+
+    # Agar Key nahi mili toh UI par saaf message dikhayega
+    if not api_key or len(api_key) < 10:
+        return "⚠️ API Key Nahi Mili! Streamlit Settings > Secrets mein 'OPENROUTER_API_KEY' sahi se save karein."
+
+    # OpenRouter Environment Variables Set Karein
+    os.environ["OPENAI_API_KEY"] = api_key
+    os.environ["OPENAI_API_BASE"] = "https://openrouter.ai/api/v1"
+
     try:
-        response = agent.run(query)
-        return response
+        # 3. Hermes / Llama LLM Setup (OpenRouter Free Endpoint)
+        llm = ChatOpenAI(
+            model="meta-llama/llama-3.1-8b-instruct:free",
+            openai_api_key=api_key,
+            openai_api_base="https://openrouter.ai/api/v1",
+            temperature=0.1,
+            default_headers={
+                "HTTP-Referer": "https://streamlit.io",
+                "X-Title": "UP Police Analytics"
+            }
+        )
+
+        # 4. Agent Execution
+        agent = create_pandas_dataframe_agent(
+            llm, 
+            df, 
+            verbose=True, 
+            allow_dangerous_code=True
+        )
+
+        return agent.run(query)
+
     except Exception as e:
-        return f"Data analyze karne mein error aaya: {e}"
+        return f"Data analyze karne mein error aaya: {str(e)}"
